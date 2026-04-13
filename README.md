@@ -1,36 +1,113 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AI Job Tailor
+
+Production-ready SaaS web application to aggregate jobs, tailor resumes with AI, calculate job match score, and export ATS-friendly PDFs.
+
+## Step Status
+
+- Step 1 (project initialization and setup): complete
+- Step 2 (Prisma + PostgreSQL schema): complete
+- Step 3 (Authentication with NextAuth + JWT session): complete
+- Step 4 (Profile CRUD API + UI): complete
+- Step 5 (Mock job aggregation API + jobs listing UI): complete
+- Step 6 (OpenAI resume tailoring engine + prompt templates): complete
+- Step 7 (Match score engine + skill gap suggestions): complete
+- Step 8 (PDF resume export): complete
+
+Included in this step:
+- Next.js (latest) with App Router
+- TypeScript
+- Tailwind CSS
+- ESLint
+- Base architecture folders for upcoming steps
+
+## Tech Stack
+
+- Frontend: Next.js + TypeScript + Tailwind CSS
+- Backend: Next.js API routes
+- Database: PostgreSQL + Prisma (Step 2)
+- Auth: NextAuth/JWT (Step 3)
+- AI: OpenAI API (Step 6)
 
 ## Getting Started
 
-First, run the development server:
+1. Install dependencies (already done if you generated locally):
+
+```bash
+npm install
+```
+
+2. Create your environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+On Windows PowerShell:
+
+```powershell
+Copy-Item .env.example .env.local
+```
+
+3. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Folder Structure
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Current structure prepared for MVP implementation:
 
-## Learn More
+- `src/app` - Next.js app routes and pages
+- `src/app/api` - API route handlers
+- `src/components` - UI components
+- `src/lib` - shared utilities, AI helpers, config
+- `src/services` - business logic
+- `prisma` - Prisma schema and migrations (Step 2)
 
-To learn more about Next.js, take a look at the following resources:
+## Scripts
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `npm run dev` - Start dev server
+- `npm run build` - Build for production
+- `npm run start` - Run production build
+- `npm run lint` - Lint codebase
+- `npm run test` - Run unit tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run prisma:generate` - Generate Prisma client
+- `npm run prisma:migrate` - Create and apply local migration
+- `npm run prisma:push` - Push schema directly to DB (without migration files)
+- `npm run prisma:studio` - Open Prisma Studio
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Database Setup (Step 2)
 
-## Deploy on Vercel
+1. Ensure PostgreSQL is running locally.
+2. Update `DATABASE_URL` in `.env`.
+3. Generate Prisma client:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+```bash
+npm run prisma:generate
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+4. Create first migration:
+
+```bash
+npm run prisma:migrate -- --name init
+```
+
+Prisma schema location:
+- `prisma/schema.prisma`
+
+Prisma runtime config location:
+- `prisma.config.ts`
+
+## Hardening Notes
+
+- API rate limiting is now persisted via the `ApiRateLimit` Prisma model.
+- Run a migration before deploying changes:
+
+```bash
+npm run prisma:migrate -- --name hardening_rate_limit
+```
+# AItailor
