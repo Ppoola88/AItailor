@@ -1,0 +1,144 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String         @id @default(uuid())
+  email        String         @unique
+  name         String?
+  passwordHash String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  profile      Profile?
+  resumes      TailoredResume[]
+  savedJobs    SavedJob[]
+
+  @@index([createdAt])
+}
+
+model Profile {
+  id             String           @id @default(uuid())
+  userId         String           @unique
+  fullName       String
+  phone          String
+  linkedIn       String?
+  professionalSummary String?
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  skills         Skill[]
+  experiences    WorkExperience[]
+  educations     Education[]
+
+  @@index([fullName])
+}
+
+model Skill {
+  id        String   @id @default(uuid())
+  profileId String
+  name      String
+  createdAt DateTime @default(now())
+  profile   Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@unique([profileId, name])
+  @@index([name])
+}
+
+model WorkExperience {
+  id          String   @id @default(uuid())
+  profileId   String
+  company     String
+  role        String
+  startDate   DateTime
+  endDate     DateTime?
+  isCurrent   Boolean  @default(false)
+  bulletPoints Json
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId, startDate])
+}
+
+model Education {
+  id          String   @id @default(uuid())
+  profileId   String
+  institution String
+  degree      String
+  fieldOfStudy String?
+  startDate   DateTime?
+  endDate     DateTime?
+  grade       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  profile     Profile  @relation(fields: [profileId], references: [id], onDelete: Cascade)
+
+  @@index([profileId])
+}
+
+model JobPosting {
+  id          String   @id @default(uuid())
+  source      String
+  externalId  String?
+  title       String
+  company     String
+  location    String
+  description String
+  applyLink   String
+  postedAt    DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  savedBy     SavedJob[]
+  resumes     TailoredResume[]
+
+  @@unique([source, externalId])
+  @@index([title])
+  @@index([company])
+}
+
+model SavedJob {
+  id         String     @id @default(uuid())
+  userId     String
+  jobId      String
+  createdAt  DateTime   @default(now())
+  user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting JobPosting @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, jobId])
+  @@index([createdAt])
+}
+
+model TailoredResume {
+  id            String      @id @default(uuid())
+  userId         String
+  jobPostingId   String?
+  summary        String
+  skillsSnapshot Json
+  experienceBody Json
+  educationBody  Json
+  matchScore     Int?
+  missingSkills  Json?
+  suggestions    Json?
+  createdAt      DateTime    @default(now())
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  jobPosting     JobPosting? @relation(fields: [jobPostingId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt])
+}
+
+model ApiRateLimit {
+  id          String   @id @default(uuid())
+  key         String
+  windowStart DateTime
+  count       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([key, windowStart])
+  @@index([updatedAt])
+}
