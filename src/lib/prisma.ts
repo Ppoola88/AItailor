@@ -1,21 +1,13 @@
 import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
-import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "@prisma/client";
-import { Pool } from "pg";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
 };
 
-const connectionString = process.env.DATABASE_URL;
+const connectionString = process.env.DATABASE_URL ?? "file:./app.db";
 
-if (!connectionString) {
-  throw new Error("DATABASE_URL is required to initialize PrismaClient");
-}
-
-const adapter = connectionString.startsWith("file:")
-  ? new PrismaBetterSqlite3({ url: connectionString })
-  : new PrismaPg(new Pool({ connectionString }));
+const adapter = new PrismaBetterSqlite3({ url: connectionString });
 
 export const prisma =
   globalForPrisma.prisma ??
